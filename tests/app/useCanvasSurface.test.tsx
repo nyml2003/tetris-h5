@@ -107,12 +107,18 @@ describe("useCanvasSurface", () => {
     expect(raf.cancel).toHaveBeenCalledWith(2);
     expect(raf.request.mock.calls.length).toBeGreaterThan(requestCountBeforeResize);
 
-    const latestRequestId = raf.request.mock.results.at(-1)?.value;
+    const latestResult = raf.request.mock.results.at(-1);
+
+    if (!latestResult || typeof latestResult.value !== "number") {
+      throw new Error("Latest requestAnimationFrame id was not captured.");
+    }
+
+    const latestRequestId = latestResult.value;
     const observer = ResizeObserverMock.instances[0];
     rendered.unmount();
 
     expect(observer?.disconnect).toHaveBeenCalledOnce();
-    expect(raf.cancel).toHaveBeenCalledWith(Number(latestRequestId));
+    expect(raf.cancel).toHaveBeenCalledWith(latestRequestId);
     expect(draw).not.toHaveBeenCalled();
   });
 });

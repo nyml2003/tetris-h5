@@ -13,9 +13,6 @@ import {
   createAppState,
   reduceAppState,
   type AppAction,
-  type AppScreen,
-  type AppState,
-  type SettingsSource,
 } from "@/app/tetrisAppState";
 import { useTetrisGameLoop } from "@/app/useTetrisGameLoop";
 import { useTetrisKeyboard } from "@/app/useTetrisKeyboard";
@@ -51,8 +48,8 @@ export function useTetrisApp() {
 
   return {
     copy: zhCN,
-    screen: state.screen as AppScreen,
-    settingsSource: state.settingsSource as SettingsSource,
+    screen: state.screen,
+    settingsSource: state.settingsSource,
     gameState: state.game,
     nextPiece,
     isPlayable,
