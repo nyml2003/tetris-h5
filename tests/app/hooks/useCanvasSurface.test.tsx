@@ -56,35 +56,39 @@ describe("useCanvasSurface", () => {
   it("draws on mount and redraws when the value or canvas size changes", () => {
     installImmediateRaf();
     ResizeObserverMock.install();
-    const draw = vi.fn();
+    const renderer = {
+      render: vi.fn(),
+    };
 
     function Harness(props: { value: string }) {
-      const ref = useCanvasSurface(props.value, draw);
+      const ref = useCanvasSurface(props.value, renderer);
       return <canvas ref={ref} />;
     }
 
     const rendered = renderElement(<Harness value="alpha" />);
     const canvas = rendered.container.firstElementChild as HTMLCanvasElement;
 
-    expect(draw).toHaveBeenCalledWith(canvas, "alpha");
+    expect(renderer.render).toHaveBeenCalledWith(canvas, "alpha");
 
     rendered.rerender(<Harness value="beta" />);
-    expect(draw).toHaveBeenLastCalledWith(canvas, "beta");
+    expect(renderer.render).toHaveBeenLastCalledWith(canvas, "beta");
 
     act(() => {
       emitResize(canvas);
     });
 
-    expect(draw).toHaveBeenLastCalledWith(canvas, "beta");
+    expect(renderer.render).toHaveBeenLastCalledWith(canvas, "beta");
   });
 
   it("cancels queued frames when a new draw is requested and on unmount", () => {
     const raf = installQueuedRaf();
     ResizeObserverMock.install();
-    const draw = vi.fn();
+    const renderer = {
+      render: vi.fn(),
+    };
 
     function Harness(props: { value: string }) {
-      const ref = useCanvasSurface(props.value, draw);
+      const ref = useCanvasSurface(props.value, renderer);
       return <canvas ref={ref} />;
     }
 
@@ -119,7 +123,7 @@ describe("useCanvasSurface", () => {
 
     expect(observer?.disconnect).toHaveBeenCalledOnce();
     expect(raf.cancel).toHaveBeenCalledWith(latestRequestId);
-    expect(draw).not.toHaveBeenCalled();
+    expect(renderer.render).not.toHaveBeenCalled();
   });
 });
 

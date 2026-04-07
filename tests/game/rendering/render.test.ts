@@ -2,8 +2,9 @@ import { act } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { createEmptyBoard, restartGame } from "@/game/core/tetrisEngine";
-import { drawGameBoard, drawPreview } from "@/game/rendering/render";
 import type { GameState } from "@/game/core/types";
+import { GameBoardRenderer } from "@/game/rendering/gameBoardRenderer";
+import { PreviewRenderer } from "@/game/rendering/previewRenderer";
 
 interface MockSurface {
   canvas: HTMLCanvasElement;
@@ -104,9 +105,10 @@ describe("render", () => {
     });
 
     const surface = createMockSurface();
+    const renderer = new GameBoardRenderer();
 
     act(() => {
-      drawGameBoard(surface.canvas, createRunningState());
+      renderer.render(surface.canvas, createRunningState());
     });
 
     expect(surface.canvas.width).toBe(240);
@@ -120,9 +122,10 @@ describe("render", () => {
   it("skips drawing the ghost piece when the round is over", () => {
     const runningSurface = createMockSurface();
     const gameOverSurface = createMockSurface();
+    const renderer = new GameBoardRenderer();
 
-    drawGameBoard(runningSurface.canvas, createRunningState());
-    drawGameBoard(gameOverSurface.canvas, {
+    renderer.render(runningSurface.canvas, createRunningState());
+    renderer.render(gameOverSurface.canvas, {
       ...createRunningState(),
       status: "gameOver",
     });
@@ -133,6 +136,7 @@ describe("render", () => {
   });
 
   it("returns early when the canvas context is unavailable", () => {
+    const renderer = new GameBoardRenderer();
     const canvas = {
       getBoundingClientRect: () => ({
         bottom: 0,
@@ -152,7 +156,7 @@ describe("render", () => {
       width: 0,
     } as unknown as HTMLCanvasElement;
 
-    drawGameBoard(canvas, createRunningState());
+    renderer.render(canvas, createRunningState());
 
     expect(canvas.width).toBe(0);
     expect(canvas.height).toBe(0);
@@ -161,9 +165,10 @@ describe("render", () => {
   it("draws the preview piece only when one exists", () => {
     const emptySurface = createMockSurface(96, 96);
     const nextSurface = createMockSurface(96, 96);
+    const renderer = new PreviewRenderer();
 
-    drawPreview(emptySurface.canvas, null);
-    drawPreview(nextSurface.canvas, "L");
+    renderer.render(emptySurface.canvas, null);
+    renderer.render(nextSurface.canvas, "L");
 
     expect(nextSurface.fillRect.mock.calls.length).toBeGreaterThan(
       emptySurface.fillRect.mock.calls.length

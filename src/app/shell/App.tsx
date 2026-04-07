@@ -15,9 +15,14 @@ import {
   SettingsScreen,
 } from "@/app/shell/screens";
 import type { GameControl } from "@/app/shell/types";
-import { drawGameBoard, drawPreview } from "@/game/rendering/render";
+import { GameBoardRenderer } from "@/game/rendering/gameBoardRenderer";
+import { PreviewRenderer } from "@/game/rendering/previewRenderer";
 
 const HELP_SECTIONS_PER_PAGE = 4;
+// Renderers are stateless; keep one instance per surface so the hook only
+// redraws for value and size changes, not because a class was recreated.
+const gameBoardRenderer = new GameBoardRenderer();
+const previewRenderer = new PreviewRenderer();
 
 function resolveBoardStyle(
   width: number,
@@ -39,8 +44,8 @@ function resolveBoardStyle(
 
 export function App() {
   const app = useTetrisApp();
-  const boardCanvasRef = useCanvasSurface(app.gameState, drawGameBoard);
-  const previewCanvasRef = useCanvasSurface(app.nextPiece, drawPreview);
+  const boardCanvasRef = useCanvasSurface(app.gameState, gameBoardRenderer);
+  const previewCanvasRef = useCanvasSurface(app.nextPiece, previewRenderer);
   const { ref: stageRef, size: stageSize } = useElementSize<HTMLDivElement>();
 
   const boardStyle = resolveBoardStyle(stageSize.width, stageSize.height);
