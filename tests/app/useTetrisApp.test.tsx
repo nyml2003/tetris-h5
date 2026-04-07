@@ -1,4 +1,4 @@
-﻿import { act } from "react";
+import { act } from "react";
 import { describe, expect, it } from "vitest";
 
 import { useTetrisApp } from "@/app/useTetrisApp";
@@ -91,5 +91,83 @@ describe("useTetrisApp", () => {
     hook.unmount();
 
     expect(raf.cancel).toHaveBeenCalledWith(pendingFrameId);
+  });
+
+  it("starts ai mode, locks manual movement, and lets autoplay advance the round", () => {
+    const raf = installRafMock();
+    const hook = renderHook(() => useTetrisApp());
+
+    act(() => {
+      hook.current.startAi();
+    });
+
+    expect(hook.current.screen).toBe("game");
+    expect(hook.current.playerMode).toBe("ai");
+    expect(hook.current.isAiMode).toBe(true);
+    expect(hook.current.controlsDisabled).toBe(true);
+    expect(hook.current.gameModeBadge).not.toBeNull();
+    expect(hook.current.gameHint).toBe(hook.current.copy.game.aiHint);
+    expect(hook.current.settingsItems.at(-1)?.value).toBe(
+      hook.current.copy.settings.aiMode
+    );
+
+    const initialPiece = { ...hook.current.gameState.activePiece };
+    dispatchKey("ArrowLeft", true);
+    expect(hook.current.gameState.activePiece).toEqual(initialPiece);
+
+    for (let index = 0; index < 4; index += 1) {
+      act(() => {
+        raf.flushBatch((index + 1) * 16);
+      });
+    }
+
+    expect(hook.current.gameState.score).toBeGreaterThan(0);
+
+    act(() => {
+      hook.current.openGameSettings();
+    });
+
+    const pausedScore = hook.current.gameState.score;
+
+    act(() => {
+      raf.flushBatch(96);
+    });
+
+    expect(hook.current.screen).toBe("settings");
+    expect(hook.current.gameState.score).toBe(pausedScore);
+  });
+
+  it("lets the player take over an ai round from paused settings", () => {
+    installRafMock();
+    const hook = renderHook(() => useTetrisApp());
+
+    act(() => {
+      hook.current.startAi();
+    });
+
+    const manualStartX = hook.current.gameState.activePiece.x;
+
+    act(() => {
+      hook.current.openGameSettings();
+    });
+
+    expect(hook.current.screen).toBe("settings");
+    expect(hook.current.playerMode).toBe("ai");
+    expect(hook.current.gameState.status).toBe("paused");
+
+    act(() => {
+      hook.current.takeOver();
+    });
+
+    expect(hook.current.screen).toBe("game");
+    expect(hook.current.playerMode).toBe("manual");
+    expect(hook.current.isAiMode).toBe(false);
+    expect(hook.current.controlsDisabled).toBe(false);
+    expect(hook.current.gameState.status).toBe("running");
+    expect(hook.current.gameHint).toBe(hook.current.copy.game.keyboard);
+    expect(hook.current.gameModeBadge).toBeNull();
+
+    dispatchKey("ArrowLeft", true);
+    expect(hook.current.gameState.activePiece.x).toBe(manualStartX - 1);
   });
 });

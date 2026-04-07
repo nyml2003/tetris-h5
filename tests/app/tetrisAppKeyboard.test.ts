@@ -41,6 +41,7 @@ describe("tetrisAppKeyboard", () => {
 
   it("maps result and gameplay keys to the right transitions", () => {
     const runningState = {
+      playerMode: "manual" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
       game: restartGame(["T", "O", "I"]),
@@ -72,5 +73,24 @@ describe("tetrisAppKeyboard", () => {
       type: "playAgain",
     });
     expect(resolveKeyboardAction(runningState, "KeyQ")).toBeNull();
+  });
+
+  it("blocks manual movement keys while ai mode is active", () => {
+    const aiState = {
+      playerMode: "ai" as const,
+      screen: "game" as const,
+      settingsSource: "home" as const,
+      game: restartGame(["T", "O", "I"]),
+    };
+
+    expect(resolveKeyboardAction(aiState, "ArrowLeft")).toBeNull();
+    expect(resolveKeyboardAction(aiState, "ArrowUp")).toBeNull();
+    expect(resolveKeyboardAction(aiState, "Escape")).toEqual({
+      type: "openSettings",
+      source: "game",
+    });
+    expect(resolveKeyboardAction(aiState, "KeyR")).toEqual({
+      type: "playAgain",
+    });
   });
 });

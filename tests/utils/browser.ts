@@ -74,27 +74,42 @@ export function installRafMock() {
     });
   }
 
+  const ids = () => [...callbacks.keys()];
+
+  const flush = (id?: number, timestamp = 16) => {
+    const nextFrameId = id ?? ids()[0];
+
+    if (!nextFrameId) {
+      throw new Error("No animation frame is scheduled.");
+    }
+
+    const callback = callbacks.get(nextFrameId);
+
+    if (!callback) {
+      throw new Error(`Animation frame ${String(nextFrameId)} was not found.`);
+    }
+
+    callbacks.delete(nextFrameId);
+    callback(timestamp);
+  };
+
+  const flushBatch = (timestamp = 16) => {
+    const frameIds = ids();
+
+    for (const frameId of frameIds) {
+      if (!callbacks.has(frameId)) {
+        continue;
+      }
+
+      flush(frameId, timestamp);
+    }
+  };
+
   return {
     request,
     cancel,
-    ids() {
-      return [...callbacks.keys()];
-    },
-    flush(id?: number, timestamp = 16) {
-      const nextFrameId = id ?? [...callbacks.keys()][0];
-
-      if (!nextFrameId) {
-        throw new Error("No animation frame is scheduled.");
-      }
-
-      const callback = callbacks.get(nextFrameId);
-
-      if (!callback) {
-        throw new Error(`Animation frame ${String(nextFrameId)} was not found.`);
-      }
-
-      callbacks.delete(nextFrameId);
-      callback(timestamp);
-    },
+    ids,
+    flush,
+    flushBatch,
   };
 }

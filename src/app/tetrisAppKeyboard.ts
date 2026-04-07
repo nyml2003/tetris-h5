@@ -81,5 +81,9 @@ export function resolveKeyboardAction(
     return { type: "playAgain" };
   }
 
+  if (state.playerMode === "ai") {
+    return null;
+  }
+
   return { type: "control", control };
 }

@@ -30,13 +30,17 @@ interface HomeScreenProps {
   subtitle: string;
   bullets: readonly string[];
   startLabel: string;
+  aiLabel: string;
   settingsLabel: string;
   onStart: () => void;
+  onAiStart: () => void;
   onSettings: () => void;
 }
 
 interface GameScreenProps {
   title: string;
+  pauseLabel: string;
+  modeBadge: string | null;
   keyboardHint: string;
   stats: readonly { label: string; value: string }[];
   nextLabel: string;
@@ -46,7 +50,7 @@ interface GameScreenProps {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
   stageRef: RefObject<HTMLDivElement | null>;
   boardStyle: CSSProperties | undefined;
-  isPlayable: boolean;
+  controlsDisabled: boolean;
   controls: readonly {
     key: string;
     label: string;
@@ -61,9 +65,11 @@ interface SettingsScreenProps {
   subtitle: string;
   items: readonly { label: string; value: string }[];
   primaryLabel: string;
+  takeOverLabel?: string;
   restartLabel: string;
   homeLabel: string;
   onPrimary: () => void;
+  onTakeOver?: () => void;
   onRestart: () => void;
   onHome: () => void;
 }
@@ -117,7 +123,7 @@ function ControlButton({
       {...pressBind}
     >
       <span className="control-button__text">{label}</span>
-      <span className="control-button__hint">{repeat ? "按住连发" : "轻触触发"}</span>
+      <span className="control-button__hint">{repeat ? "按住连发" : "单次触发"}</span>
     </button>
   );
 }
@@ -128,8 +134,10 @@ function HomeScreen({
   subtitle,
   bullets,
   startLabel,
+  aiLabel,
   settingsLabel,
   onStart,
+  onAiStart,
   onSettings,
 }: HomeScreenProps) {
   return (
@@ -148,6 +156,7 @@ function HomeScreen({
 
       <div className="screen-actions">
         <ActionButton label={startLabel} onPress={onStart} />
+        <ActionButton label={aiLabel} onPress={onAiStart} variant="secondary" />
         <ActionButton
           label={settingsLabel}
           onPress={onSettings}
@@ -160,6 +169,8 @@ function HomeScreen({
 
 function GameScreen({
   title,
+  pauseLabel,
+  modeBadge,
   keyboardHint,
   stats,
   nextLabel,
@@ -169,21 +180,25 @@ function GameScreen({
   previewCanvasRef,
   stageRef,
   boardStyle,
-  isPlayable,
+  controlsDisabled,
   controls,
 }: GameScreenProps) {
   return (
     <section className="app-screen">
       <header className="game-topbar">
         <div className="game-topbar__title">
-          <span className="screen-tag">{title}</span>
+          <div className="game-topbar__meta">
+            <span className="screen-tag">{title}</span>
+            {modeBadge ? <span className="header-pill header-pill--ai">{modeBadge}</span> : null}
+          </div>
+
           <button
             type="button"
             className="header-pill"
             onClick={onPause}
-            aria-label="打开暂停与设置"
+            aria-label={pauseLabel}
           >
-            暂停
+            {pauseLabel}
           </button>
         </div>
 
@@ -203,7 +218,7 @@ function GameScreen({
             <canvas
               ref={previewCanvasRef}
               className="preview-canvas"
-              aria-label="下一块预览"
+              aria-label={nextLabel}
             />
           </article>
         </div>
@@ -228,7 +243,7 @@ function GameScreen({
               onPress={control.onPress}
               repeat={control.repeat}
               accent={control.accent}
-              disabled={!isPlayable}
+              disabled={controlsDisabled}
             />
           ))}
         </div>
@@ -244,9 +259,11 @@ function SettingsScreen({
   subtitle,
   items,
   primaryLabel,
+  takeOverLabel,
   restartLabel,
   homeLabel,
   onPrimary,
+  onTakeOver,
   onRestart,
   onHome,
 }: SettingsScreenProps) {
@@ -269,6 +286,13 @@ function SettingsScreen({
 
       <div className="screen-actions">
         <ActionButton label={primaryLabel} onPress={onPrimary} />
+        {takeOverLabel && onTakeOver ? (
+          <ActionButton
+            label={takeOverLabel}
+            onPress={onTakeOver}
+            variant="secondary"
+          />
+        ) : null}
         <ActionButton label={restartLabel} onPress={onRestart} variant="secondary" />
         <ActionButton label={homeLabel} onPress={onHome} variant="secondary" />
       </div>
@@ -371,6 +395,7 @@ export function App() {
       onPress: app.openGameSettings,
     },
   ] as const;
+  const showTakeOverAction = app.settingsFromGame && app.isAiMode;
 
   return (
     <div className="app-root">
@@ -384,8 +409,10 @@ export function App() {
           subtitle={app.copy.home.subtitle}
           bullets={app.copy.home.bullets}
           startLabel={app.copy.home.primary}
+          aiLabel={app.copy.home.ai}
           settingsLabel={app.copy.home.secondary}
           onStart={app.startGame}
+          onAiStart={app.startAi}
           onSettings={app.openHomeSettings}
         />
       ) : null}
@@ -393,7 +420,9 @@ export function App() {
       {app.screen === "game" ? (
         <GameScreen
           title={app.copy.game.status}
-          keyboardHint={app.copy.game.keyboard}
+          pauseLabel={app.copy.game.pause}
+          modeBadge={app.gameModeBadge}
+          keyboardHint={app.gameHint}
           stats={app.summaryStats}
           nextLabel={app.copy.hud.next}
           nextPiece={app.nextPiece ? pieceLabels[app.nextPiece] : "--"}
@@ -402,7 +431,7 @@ export function App() {
           previewCanvasRef={previewCanvasRef}
           stageRef={stageRef}
           boardStyle={boardStyle}
-          isPlayable={app.isPlayable}
+          controlsDisabled={app.controlsDisabled}
           controls={controls}
         />
       ) : null}
@@ -411,15 +440,19 @@ export function App() {
         <SettingsScreen
           title={app.copy.settings.title}
           subtitle={app.copy.settings.subtitle}
-          items={app.copy.settings.items}
+          items={app.settingsItems}
           primaryLabel={
             app.settingsFromGame
               ? app.copy.settings.resume
               : app.copy.settings.start
           }
+          takeOverLabel={
+            showTakeOverAction ? app.copy.settings.takeOver : undefined
+          }
           restartLabel={app.copy.settings.restart}
           homeLabel={app.copy.settings.home}
           onPrimary={app.settingsFromGame ? app.leaveSettings : app.startGame}
+          onTakeOver={showTakeOverAction ? app.takeOver : undefined}
           onRestart={app.playAgain}
           onHome={app.goHome}
         />

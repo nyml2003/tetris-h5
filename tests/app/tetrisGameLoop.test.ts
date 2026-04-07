@@ -9,6 +9,7 @@ import { restartGame } from "@/game/tetrisEngine";
 describe("tetrisGameLoop", () => {
   it("initializes the first running frame without dispatching ticks", () => {
     const state = {
+      playerMode: "manual" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
       game: restartGame(["T", "O", "I"]),
@@ -23,6 +24,7 @@ describe("tetrisGameLoop", () => {
 
   it("accumulates elapsed time into gameplay ticks", () => {
     const state = {
+      playerMode: "manual" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
       game: restartGame(["T", "O", "I"]),
@@ -43,6 +45,7 @@ describe("tetrisGameLoop", () => {
 
   it("resets the loop clock when the round is not actively running", () => {
     const state = {
+      playerMode: "ai" as const,
       screen: "settings" as const,
       settingsSource: "game" as const,
       game: {
