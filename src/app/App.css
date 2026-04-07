@@ -144,7 +144,10 @@ button:focus-visible {
 }
 
 .screen-card--help {
-  gap: 0.8rem;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  align-content: stretch;
+  gap: 0.72rem;
   overflow: hidden;
 }
 
@@ -190,23 +193,15 @@ button:focus-visible {
   line-height: 1.4;
 }
 
-.home-note {
-  margin: 0;
-  padding: 0.82rem 0.95rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-soft);
-  font-size: 0.84rem;
-  line-height: 1.45;
-}
-
 .help-grid {
-  flex: 1;
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
   align-content: start;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.12rem;
 }
 
 .help-card {
@@ -217,6 +212,7 @@ button:focus-visible {
   background: rgba(255, 255, 255, 0.05);
   display: grid;
   gap: 0.65rem;
+  align-content: start;
 }
 
 .help-card__header {
@@ -264,19 +260,33 @@ button:focus-visible {
 .help-footer {
   display: grid;
   gap: 0.5rem;
+  padding-top: 0.58rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  background:
+    linear-gradient(180deg, rgba(10, 16, 29, 0) 0%, rgba(10, 16, 29, 0.7) 42%, rgba(10, 16, 29, 0.92) 100%);
 }
 
 .help-pagination {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 0.55rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.42rem;
   align-items: center;
+}
+
+.help-pagination .action-button {
+  width: auto;
+  min-height: 2.3rem;
+  padding: 0.56rem 0.78rem;
+  border-radius: 0.92rem;
+  white-space: nowrap;
 }
 
 .help-pagination__status {
   color: var(--text-soft);
   font-size: 0.82rem;
   text-align: center;
+  min-width: 0;
+  padding-inline: 0.2rem;
   white-space: nowrap;
 }
 
@@ -378,16 +388,20 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.35rem;
+  align-items: stretch;
 }
 
 .stat-chip {
   min-width: 0;
+  min-height: 3.72rem;
   padding: 0.58rem 0.62rem;
   border-radius: 1rem;
   border: 1px solid var(--panel-border);
   background: rgba(10, 16, 29, 0.82);
   display: grid;
-  gap: 0.22rem;
+  grid-template-rows: auto 1fr;
+  gap: 0.28rem;
+  align-content: space-between;
 }
 
 .stat-chip--preview {
@@ -402,11 +416,14 @@ button:focus-visible {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-soft);
+  white-space: nowrap;
 }
 
 .stat-chip__value {
   font-size: 0.98rem;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .preview-canvas {
@@ -522,12 +539,12 @@ button:focus-visible {
   font-size: 1rem;
   font-weight: 700;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 480px) {
   .screen-actions--panel,
-  .screen-actions--dual,
-  .help-pagination {
+  .screen-actions--dual {
     grid-template-columns: 1fr;
   }
 
@@ -536,8 +553,21 @@ button:focus-visible {
     grid-column: auto;
   }
 
-  .help-pagination__status {
-    order: -1;
+  .help-pagination {
+    gap: 0.35rem;
+  }
+
+  .help-pagination .action-button {
+    min-height: 2.15rem;
+    padding: 0.5rem 0.66rem;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-chip--preview {
+    grid-column: 1 / -1;
   }
 }
 
@@ -578,6 +608,14 @@ button:focus-visible {
 
   .game-topbar {
     gap: 0.28rem;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-chip--preview {
+    grid-column: 1 / -1;
   }
 
   .stat-chip {

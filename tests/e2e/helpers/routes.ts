@@ -31,6 +31,7 @@ export const testIds = {
   gameTopbar: "game-topbar",
   helpActions: "help-actions",
   helpCard: "help-card",
+  helpFooter: "help-footer",
   helpGrid: "help-grid",
   helpPagination: "help-pagination",
   helpPaginationStatus: "help-pagination-status",
@@ -87,6 +88,10 @@ export function helpPanel(page: Page) {
 
 export function helpGrid(page: Page) {
   return page.getByTestId(testIds.helpGrid);
+}
+
+export function helpFooter(page: Page) {
+  return page.getByTestId(testIds.helpFooter);
 }
 
 export function helpCards(page: Page) {

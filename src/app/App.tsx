@@ -33,11 +33,10 @@ interface HelpSection {
 }
 
 interface HomeScreenProps {
-  tag: string;
+  tag?: string;
   title: string;
   subtitle: string;
   bullets: readonly string[];
-  note: string;
   startLabel: string;
   aiLabel: string;
   helpLabel: string;
@@ -91,7 +90,7 @@ interface GameScreenProps {
 
 interface SettingsScreenProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   items: readonly { label: string; value: string }[];
   primaryLabel: string;
   takeOverLabel?: string;
@@ -173,7 +172,6 @@ function HomeScreen({
   title,
   subtitle,
   bullets,
-  note,
   startLabel,
   aiLabel,
   helpLabel,
@@ -187,7 +185,7 @@ function HomeScreen({
         className="screen-card screen-card--hero screen-card--home"
         data-testid="home-card"
       >
-        <span className="screen-tag">{tag}</span>
+        {tag ? <span className="screen-tag">{tag}</span> : null}
         <h1 className="screen-title">{title}</h1>
         <p className="screen-subtitle">{subtitle}</p>
 
@@ -196,8 +194,6 @@ function HomeScreen({
             <li key={item}>{item}</li>
           ))}
         </ul>
-
-        <p className="home-note">{note}</p>
       </div>
 
       <div className="screen-actions screen-actions--home" data-testid="home-actions">
@@ -261,7 +257,7 @@ function HelpScreen({
           ))}
         </div>
 
-        <div className="help-footer">
+        <div className="help-footer" data-testid="help-footer">
           <div className="help-pagination" data-testid="help-pagination">
             <ActionButton
               label={previousLabel}
@@ -341,7 +337,7 @@ function GameScreen({
           </button>
         </div>
 
-        <div className="stats-row">
+        <div className="stats-row" data-testid="stats-row">
           {stats.map((item) => (
             <article key={item.label} className="stat-chip">
               <span className="stat-chip__label">{item.label}</span>
@@ -411,7 +407,9 @@ function SettingsScreen({
       <div className="screen-card screen-card--panel" data-testid="settings-panel">
         <span className="screen-tag">暂停 / 设置</span>
         <h2 className="screen-title screen-title--panel">{title}</h2>
-        <p className="screen-subtitle screen-subtitle--panel">{subtitle}</p>
+        {subtitle ? (
+          <p className="screen-subtitle screen-subtitle--panel">{subtitle}</p>
+        ) : null}
 
         <div className="settings-list" data-testid="settings-list">
           {items.map((item) => (
@@ -552,7 +550,6 @@ export function App() {
           title={app.copy.home.title}
           subtitle={app.copy.home.subtitle}
           bullets={app.copy.home.bullets}
-          note={app.copy.home.note}
           startLabel={app.copy.home.primary}
           aiLabel={app.copy.home.ai}
           helpLabel={app.copy.home.secondary}

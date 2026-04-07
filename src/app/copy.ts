@@ -19,13 +19,12 @@ export const zhCN = {
     next: "下一块",
   },
   home: {
-    tag: "单屏 H5",
+    tag: "",
     title: "俄罗斯方块",
-    subtitle: "打开即玩，当前设备竖屏内不滚动。",
+    subtitle: "打开即玩，开局、对局和暂停都留在一屏里。",
     primary: "开始游戏",
     ai: "AI 代玩",
     secondary: "查看键位",
-    note: "键位说明和触屏操作已拆到独立页面，首页只保留快速进入。",
     bullets: [
       "左移 / 右移：调整落点",
       "旋转：快速寻找缝隙",
@@ -35,7 +34,7 @@ export const zhCN = {
   help: {
     tag: "操作说明",
     title: "键位与交互",
-    subtitle: "帮助页按双栏分组，内容多时自动分成多页，不再挤占首页高度。",
+    subtitle: "把键盘、触控和 AI 接管方式拆成卡片，翻页就能快速看完。",
     primary: "开始游戏",
     ai: "AI 代玩",
     home: "返回首页",
@@ -109,11 +108,11 @@ export const zhCN = {
   },
   settings: {
     title: "暂停 / 设置",
-    subtitle: "当前版本先把单屏体验和手感做稳，不上完整 i18n。",
+    subtitle: "",
     items: [
-      { label: "语言", value: "简体中文资源表" },
-      { label: "操作", value: "触控按钮 + 键盘映射" },
-      { label: "布局", value: "设备视口内单屏显示" },
+      { label: "语言", value: "简体中文" },
+      { label: "操作", value: "触控 + 键盘" },
+      { label: "版式", value: "棋盘优先" },
     ],
     mode: "模式",
     manualMode: "手动",

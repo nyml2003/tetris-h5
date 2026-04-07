@@ -84,7 +84,6 @@ describe("App", () => {
     expect(markup).toContain(zhCN.home.primary);
     expect(markup).toContain(zhCN.home.ai);
     expect(markup).toContain(zhCN.home.secondary);
-    expect(markup).toContain(zhCN.home.note);
     expect(markup).not.toContain(zhCN.help.title);
   });
 

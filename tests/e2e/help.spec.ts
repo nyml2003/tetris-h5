@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import {
   expectInViewport,
+  expectNoOverlap,
   expectNoHorizontalOverflow,
 } from "./helpers/layout";
 import {
@@ -11,6 +12,7 @@ import {
   gameScreen,
   helpActions,
   helpCards,
+  helpFooter,
   helpGrid,
   helpPagination,
   helpPaginationStatus,
@@ -26,6 +28,7 @@ test("keeps the help cards inside the layout and paginates correctly", async ({ 
 
   await expectInViewport(helpPanel(page));
   await expectNoHorizontalOverflow(helpGrid(page));
+  await expectNoOverlap(helpGrid(page), helpFooter(page));
   await expect(helpCards(page)).toHaveCount(4);
 
   const cardCount = await helpCards(page).count();
