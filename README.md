@@ -30,8 +30,16 @@
 
 ## 目录说明
 
-- `src/app`：页面壳、中文文案、主逻辑 hook、Canvas hook、布局样式
-- `src/game`：纯游戏规则、画布绘制函数和测试
+- `src/app/shell`：应用壳、页面结构和样式入口
+- `src/app/content`：中文文案和展示文案映射
+- `src/app/routing`：URL 与 history 同步
+- `src/app/hooks`：React hooks 协调层
+- `src/app/state`：状态机、键盘映射、view-model 和纯逻辑
+- `src/game/core`：方块规则、类型、常量和引擎
+- `src/game/ai`：AI 代玩决策
+- `src/game/rendering`：Canvas 绘制
+- `tests/app`：按 `shell / hooks / state` 镜像应用层测试
+- `tests/game`：按 `core / ai / rendering` 镜像游戏层测试
 
 ## 设计说明
 
