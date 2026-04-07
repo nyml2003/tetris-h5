@@ -8,7 +8,8 @@
     "types": [
       "node"
     ],
-    "noEmit": true
+    "noEmit": true,
+    "tsBuildInfoFile": "./node_modules/.tsbuildinfo/tsconfig.node.tsbuildinfo"
   },
   "include": [
     "vite.config.ts",

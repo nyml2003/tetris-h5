@@ -1,5 +1,5 @@
-import { act } from "react";
-import { describe, expect, it } from "vitest";
+﻿import { act } from "react";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { useTetrisApp } from "@/app/useTetrisApp";
 
@@ -17,23 +17,33 @@ function dispatchKey(code: string, cancelable = false) {
 }
 
 describe("useTetrisApp", () => {
+  beforeEach(() => {
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("hydrates a new game when the current path is /play", () => {
+    installRafMock();
+    window.history.replaceState(null, "", "/play");
+
+    const hook = renderHook(() => useTetrisApp());
+
+    expect(hook.current.screen).toBe("game");
+    expect(hook.current.isPlayable).toBe(true);
+    expect(window.location.pathname).toBe("/play");
+  });
+
   it("handles home, game, and settings keyboard flows", () => {
     installRafMock();
     const hook = renderHook(() => useTetrisApp());
 
     expect(hook.current.screen).toBe("home");
     expect(hook.current.isPlayable).toBe(false);
-
-    dispatchKey("KeyS");
-    expect(hook.current.screen).toBe("settings");
-    expect(hook.current.settingsSource).toBe("home");
-
-    dispatchKey("Enter");
-    expect(hook.current.screen).toBe("home");
+    expect(window.location.pathname).toBe("/");
 
     dispatchKey("Enter");
     expect(hook.current.screen).toBe("game");
     expect(hook.current.isPlayable).toBe(true);
+    expect(window.location.pathname).toBe("/play");
 
     const startY = hook.current.gameState.activePiece.y;
     const dropEvent = dispatchKey("ArrowDown", true);
@@ -46,14 +56,17 @@ describe("useTetrisApp", () => {
     expect(hook.current.screen).toBe("settings");
     expect(hook.current.settingsFromGame).toBe(true);
     expect(hook.current.gameState.status).toBe("paused");
+    expect(window.location.pathname).toBe("/play");
 
     dispatchKey("Enter");
     expect(hook.current.screen).toBe("game");
     expect(hook.current.gameState.status).toBe("running");
+    expect(window.location.pathname).toBe("/play");
 
     dispatchKey("KeyR");
     expect(hook.current.screen).toBe("game");
     expect(hook.current.gameState.score).toBe(0);
+    expect(window.location.pathname).toBe("/play");
   });
 
   it("advances frames only while the game is actively running", () => {
@@ -110,6 +123,7 @@ describe("useTetrisApp", () => {
     expect(hook.current.settingsItems.at(-1)?.value).toBe(
       hook.current.copy.settings.aiMode
     );
+    expect(window.location.pathname).toBe("/play");
 
     const initialPiece = { ...hook.current.gameState.activePiece };
     dispatchKey("ArrowLeft", true);
@@ -169,5 +183,41 @@ describe("useTetrisApp", () => {
 
     dispatchKey("ArrowLeft", true);
     expect(hook.current.gameState.activePiece.x).toBe(manualStartX - 1);
+  });
+
+  it("syncs route changes and restores screen state on popstate", () => {
+    installRafMock();
+    const hook = renderHook(() => useTetrisApp());
+
+    act(() => {
+      hook.current.startGame();
+    });
+
+    act(() => {
+      hook.current.openGameSettings();
+    });
+
+    const pausedPlayEntry = window.history.state;
+
+    act(() => {
+      hook.current.goHome();
+    });
+
+    expect(hook.current.screen).toBe("home");
+    expect(window.location.pathname).toBe("/");
+
+    act(() => {
+      window.history.replaceState(pausedPlayEntry, "", "/play");
+      window.dispatchEvent(
+        new PopStateEvent("popstate", {
+          state: pausedPlayEntry,
+        })
+      );
+    });
+
+    expect(hook.current.screen).toBe("settings");
+    expect(hook.current.settingsFromGame).toBe(true);
+    expect(hook.current.gameState.status).toBe("paused");
+    expect(window.location.pathname).toBe("/play");
   });
 });

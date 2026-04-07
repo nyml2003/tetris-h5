@@ -32,12 +32,28 @@ export function resolveKeyboardAction(
       return { type: "start" };
     }
 
+    if (code === "KeyH") {
+      return { type: "openHelp" };
+    }
+
     if (code === "Escape") {
       return { type: "goHome" };
     }
 
-    if (code === "KeyS") {
-      return { type: "openSettings", source: "home" };
+    return null;
+  }
+
+  if (state.screen === "help") {
+    if (code === "Enter") {
+      return { type: "start" };
+    }
+
+    if (code === "KeyA") {
+      return { type: "startAi" };
+    }
+
+    if (code === "Escape") {
+      return { type: "goHome" };
     }
 
     return null;

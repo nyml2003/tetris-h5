@@ -1,6 +1,7 @@
-import { useReducer } from "react";
+﻿import { useReducer } from "react";
 import type { ControlAction } from "@/game/types";
 
+import { createInitialAppRouteState } from "@/app/appRoute";
 import { zhCN } from "@/app/copy";
 import {
   createSettingsItems,
@@ -19,6 +20,7 @@ import {
   reduceAppState,
   type AppAction,
 } from "@/app/tetrisAppState";
+import { useAppRouteSync } from "@/app/useAppRoute";
 import { useTetrisAutoplay } from "@/app/useTetrisAutoplay";
 import { useTetrisGameLoop } from "@/app/useTetrisGameLoop";
 import { useTetrisKeyboard } from "@/app/useTetrisKeyboard";
@@ -34,11 +36,16 @@ export {
 } from "@/app/tetrisAppState";
 
 export function useTetrisApp() {
-  const [state, dispatch] = useReducer(reduceAppState, undefined, createAppState);
+  const [state, dispatch] = useReducer(
+    reduceAppState,
+    undefined,
+    createInitialAppRouteState
+  );
 
   useTetrisGameLoop(state, dispatch);
   useTetrisAutoplay(state, dispatch);
   useTetrisKeyboard(state, dispatch);
+  useAppRouteSync(state, dispatch);
 
   const nextPiece = selectNextPiece(state);
   const isAiMode = selectIsAiMode(state);
@@ -64,6 +71,7 @@ export function useTetrisApp() {
     playerMode: state.playerMode,
     screen: state.screen,
     settingsSource: state.settingsSource,
+    helpPage: state.helpPage,
     gameState: state.game,
     nextPiece,
     isAiMode,
@@ -77,11 +85,11 @@ export function useTetrisApp() {
     gameModeBadge,
     startGame: () => dispatchAction({ type: "start" }),
     startAi: () => dispatchAction({ type: "startAi" }),
+    openHelp: () => dispatchAction({ type: "openHelp" }),
+    setHelpPage: (page: number) => dispatchAction({ type: "setHelpPage", page }),
     takeOver: () => dispatchAction({ type: "takeOver" }),
     playAgain: () => dispatchAction({ type: "playAgain" }),
     goHome: () => dispatchAction({ type: "goHome" }),
-    openHomeSettings: () =>
-      dispatchAction({ type: "openSettings", source: "home" }),
     openGameSettings: () =>
       dispatchAction({ type: "openSettings", source: "game" }),
     leaveSettings: () => dispatchAction({ type: "leaveSettings" }),

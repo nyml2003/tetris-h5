@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: dark;
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   --bg: #0b1220;
@@ -94,6 +94,18 @@ button:focus-visible {
   overflow: hidden;
 }
 
+.app-screen--home {
+  justify-content: space-between;
+}
+
+.app-screen--panel {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-content: stretch;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .screen-card {
   border-radius: 1.7rem;
   border: 1px solid var(--panel-border);
@@ -120,6 +132,7 @@ button:focus-visible {
 .screen-card--result {
   gap: 0.9rem;
   justify-content: space-between;
+  overflow: auto;
 }
 
 .screen-tag {
@@ -164,9 +177,80 @@ button:focus-visible {
   line-height: 1.45;
 }
 
+.shortcut-panel {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.shortcut-panel__header {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.shortcut-panel__title {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.shortcut-panel__subtitle {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.shortcut-chip {
+  min-width: 0;
+  padding: 0.68rem 0.72rem;
+  border-radius: 1rem;
+  background: rgba(11, 18, 32, 0.68);
+  display: grid;
+  gap: 0.35rem;
+}
+
+.shortcut-chip__key {
+  width: fit-content;
+  padding: 0.16rem 0.42rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent-soft);
+  font-family: "Consolas", "SFMono-Regular", monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.shortcut-chip__value {
+  font-size: 0.86rem;
+  color: var(--text-main);
+}
+
 .screen-actions {
   display: grid;
   gap: 0.65rem;
+}
+
+.screen-actions--panel,
+.screen-actions--dual {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.screen-actions--panel .action-button--primary {
+  grid-column: 1 / -1;
+}
+
+.screen-actions--panel > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 .action-button,
@@ -370,6 +454,19 @@ button:focus-visible {
   text-align: right;
 }
 
+@media (max-width: 420px) {
+  .shortcut-grid,
+  .screen-actions--panel,
+  .screen-actions--dual {
+    grid-template-columns: 1fr;
+  }
+
+  .screen-actions--panel .action-button--primary,
+  .screen-actions--panel > :last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+
 @media (max-width: 360px) {
   .stats-row {
     gap: 0.35rem;
@@ -402,4 +499,20 @@ button:focus-visible {
   font-weight: 800;
   letter-spacing: 0.06em;
   box-shadow: 0 8px 22px rgba(69, 167, 156, 0.28);
+}
+
+@media (max-height: 760px) {
+  .app-screen {
+    gap: 0.6rem;
+  }
+
+  .screen-card--hero,
+  .screen-card--panel,
+  .screen-card--result {
+    padding: 1rem;
+  }
+
+  .action-button {
+    min-height: 2.9rem;
+  }
 }

@@ -1,4 +1,4 @@
-import {
+﻿import {
   applyAction,
   beginGame,
   createGameState,
@@ -8,7 +8,7 @@ import {
 } from "@/game/tetrisEngine";
 import type { ControlAction, GameState } from "@/game/types";
 
-export type AppScreen = "home" | "game" | "settings" | "result";
+export type AppScreen = "home" | "help" | "game" | "settings" | "result";
 export type PlayerMode = "manual" | "ai";
 export type SettingsSource = "home" | "game";
 
@@ -16,25 +16,30 @@ export interface AppState {
   playerMode: PlayerMode;
   screen: AppScreen;
   settingsSource: SettingsSource;
+  helpPage: number;
   game: GameState;
 }
 
 export type AppAction =
   | { type: "start" }
   | { type: "startAi" }
+  | { type: "openHelp" }
+  | { type: "setHelpPage"; page: number }
   | { type: "tick" }
   | { type: "control"; control: ControlAction }
   | { type: "openSettings"; source: SettingsSource }
   | { type: "leaveSettings" }
   | { type: "takeOver" }
   | { type: "playAgain" }
-  | { type: "goHome" };
+  | { type: "goHome" }
+  | { type: "restore"; state: AppState };
 
 export function createAppState(): AppState {
   return {
     playerMode: "manual",
     screen: "home",
     settingsSource: "home",
+    helpPage: 0,
     game: createGameState(),
   };
 }
@@ -61,6 +66,7 @@ export function reduceAppState(state: AppState, action: AppAction): AppState {
         playerMode: "manual",
         screen: "game",
         settingsSource: "home",
+        helpPage: 0,
         game: restartGame(),
       };
     case "startAi":
@@ -68,8 +74,22 @@ export function reduceAppState(state: AppState, action: AppAction): AppState {
         playerMode: "ai",
         screen: "game",
         settingsSource: "home",
+        helpPage: 0,
         game: restartGame(),
       };
+    case "openHelp":
+      return {
+        ...state,
+        screen: "help",
+        helpPage: 0,
+      };
+    case "setHelpPage":
+      return state.screen === "help"
+        ? {
+            ...state,
+            helpPage: Math.max(0, action.page),
+          }
+        : state;
     case "tick":
       return finalizeGameScreen(state, stepGame(state.game));
     case "control":
@@ -109,10 +129,13 @@ export function reduceAppState(state: AppState, action: AppAction): AppState {
         playerMode: state.playerMode,
         screen: "game",
         settingsSource: "home",
+        helpPage: 0,
         game: restartGame(),
       };
     case "goHome":
       return createAppState();
+    case "restore":
+      return action.state;
     default:
       return state;
   }

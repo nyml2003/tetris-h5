@@ -1,4 +1,4 @@
-import "@/app/App.css";
+﻿import "@/app/App.css";
 
 import type { CSSProperties, RefObject } from "react";
 
@@ -8,6 +8,8 @@ import { useElementSize } from "@/app/useElementSize";
 import { usePressRepeat } from "@/app/usePressRepeat";
 import { useTetrisApp } from "@/app/useTetrisApp";
 import { drawGameBoard, drawPreview } from "@/game/render";
+
+const HELP_SECTIONS_PER_PAGE = 4;
 
 interface ActionButtonProps {
   label: string;
@@ -24,17 +26,44 @@ interface ControlButtonProps {
   accent?: boolean;
 }
 
-interface HomeScreenProps {
+interface HelpSection {
   title: string;
+  description: string;
+  items: readonly { key: string; value: string }[];
+}
+
+interface HomeScreenProps {
   tag: string;
+  title: string;
   subtitle: string;
   bullets: readonly string[];
+  note: string;
   startLabel: string;
   aiLabel: string;
-  settingsLabel: string;
+  helpLabel: string;
   onStart: () => void;
   onAiStart: () => void;
-  onSettings: () => void;
+  onHelp: () => void;
+}
+
+interface HelpScreenProps {
+  tag: string;
+  title: string;
+  subtitle: string;
+  hint: string;
+  sections: readonly HelpSection[];
+  currentPage: number;
+  totalPages: number;
+  previousLabel: string;
+  nextLabel: string;
+  startLabel: string;
+  aiLabel: string;
+  homeLabel: string;
+  onPrevious: () => void;
+  onNext: () => void;
+  onStart: () => void;
+  onAiStart: () => void;
+  onHome: () => void;
 }
 
 interface GameScreenProps {
@@ -128,21 +157,32 @@ function ControlButton({
   );
 }
 
+function chunkSections(sections: readonly HelpSection[], pageSize: number) {
+  const pages: HelpSection[][] = [];
+
+  for (let index = 0; index < sections.length; index += pageSize) {
+    pages.push(sections.slice(index, index + pageSize));
+  }
+
+  return pages;
+}
+
 function HomeScreen({
-  title,
   tag,
+  title,
   subtitle,
   bullets,
+  note,
   startLabel,
   aiLabel,
-  settingsLabel,
+  helpLabel,
   onStart,
   onAiStart,
-  onSettings,
+  onHelp,
 }: HomeScreenProps) {
   return (
-    <section className="app-screen">
-      <div className="screen-card screen-card--hero">
+    <section className="app-screen app-screen--home">
+      <div className="screen-card screen-card--hero screen-card--home">
         <span className="screen-tag">{tag}</span>
         <h1 className="screen-title">{title}</h1>
         <p className="screen-subtitle">{subtitle}</p>
@@ -152,16 +192,92 @@ function HomeScreen({
             <li key={item}>{item}</li>
           ))}
         </ul>
+
+        <p className="home-note">{note}</p>
       </div>
 
-      <div className="screen-actions">
+      <div className="screen-actions screen-actions--home">
         <ActionButton label={startLabel} onPress={onStart} />
         <ActionButton label={aiLabel} onPress={onAiStart} variant="secondary" />
-        <ActionButton
-          label={settingsLabel}
-          onPress={onSettings}
-          variant="secondary"
-        />
+        <ActionButton label={helpLabel} onPress={onHelp} variant="secondary" />
+      </div>
+    </section>
+  );
+}
+
+function HelpScreen({
+  tag,
+  title,
+  subtitle,
+  hint,
+  sections,
+  currentPage,
+  totalPages,
+  previousLabel,
+  nextLabel,
+  startLabel,
+  aiLabel,
+  homeLabel,
+  onPrevious,
+  onNext,
+  onStart,
+  onAiStart,
+  onHome,
+}: HelpScreenProps) {
+  return (
+    <section className="app-screen app-screen--panel app-screen--help">
+      <div className="screen-card screen-card--panel screen-card--help">
+        <span className="screen-tag">{tag}</span>
+        <h2 className="screen-title screen-title--panel">{title}</h2>
+        <p className="screen-subtitle screen-subtitle--panel">{subtitle}</p>
+
+        <div className="help-grid">
+          {sections.map((section) => (
+            <article key={section.title} className="help-card">
+              <div className="help-card__header">
+                <strong className="help-card__title">{section.title}</strong>
+                <span className="help-card__meta">{section.description}</span>
+              </div>
+
+              <div className="help-card__list">
+                {section.items.map((item) => (
+                  <div key={`${section.title}-${item.key}`} className="help-item">
+                    <kbd className="help-item__key">{item.key}</kbd>
+                    <span className="help-item__value">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="help-footer">
+          <div className="help-pagination">
+            <ActionButton
+              label={previousLabel}
+              onPress={onPrevious}
+              variant="secondary"
+              disabled={currentPage <= 0}
+            />
+            <span className="help-pagination__status">
+              第 {currentPage + 1} / {totalPages} 页
+            </span>
+            <ActionButton
+              label={nextLabel}
+              onPress={onNext}
+              variant="secondary"
+              disabled={currentPage >= totalPages - 1}
+            />
+          </div>
+
+          <p className="help-hint">{hint}</p>
+        </div>
+      </div>
+
+      <div className="screen-actions screen-actions--panel screen-actions--help">
+        <ActionButton label={startLabel} onPress={onStart} />
+        <ActionButton label={aiLabel} onPress={onAiStart} variant="secondary" />
+        <ActionButton label={homeLabel} onPress={onHome} variant="secondary" />
       </div>
     </section>
   );
@@ -268,7 +384,7 @@ function SettingsScreen({
   onHome,
 }: SettingsScreenProps) {
   return (
-    <section className="app-screen">
+    <section className="app-screen app-screen--panel">
       <div className="screen-card screen-card--panel">
         <span className="screen-tag">暂停 / 设置</span>
         <h2 className="screen-title screen-title--panel">{title}</h2>
@@ -284,7 +400,7 @@ function SettingsScreen({
         </div>
       </div>
 
-      <div className="screen-actions">
+      <div className="screen-actions screen-actions--panel">
         <ActionButton label={primaryLabel} onPress={onPrimary} />
         {takeOverLabel && onTakeOver ? (
           <ActionButton
@@ -311,7 +427,7 @@ function ResultScreen({
   onSecondary,
 }: ResultScreenProps) {
   return (
-    <section className="app-screen">
+    <section className="app-screen app-screen--panel">
       <div className="screen-card screen-card--result">
         <span className="screen-tag">{tag}</span>
         <h2 className="screen-title screen-title--panel">{title}</h2>
@@ -327,7 +443,7 @@ function ResultScreen({
         </div>
       </div>
 
-      <div className="screen-actions">
+      <div className="screen-actions screen-actions--dual">
         <ActionButton label={primaryLabel} onPress={onPrimary} />
         <ActionButton
           label={secondaryLabel}
@@ -357,6 +473,11 @@ export function App() {
           height: `${boardWidth * 2}px`,
         } satisfies CSSProperties)
       : undefined;
+
+  const helpPages = chunkSections(app.copy.help.sections, HELP_SECTIONS_PER_PAGE);
+  const totalHelpPages = Math.max(helpPages.length, 1);
+  const activeHelpPage = Math.min(app.helpPage, totalHelpPages - 1);
+  const activeHelpSections = helpPages[activeHelpPage] ?? [];
 
   const controls = [
     {
@@ -404,16 +525,39 @@ export function App() {
 
       {app.screen === "home" ? (
         <HomeScreen
-          title={app.copy.home.title}
           tag={app.copy.home.tag}
+          title={app.copy.home.title}
           subtitle={app.copy.home.subtitle}
           bullets={app.copy.home.bullets}
+          note={app.copy.home.note}
           startLabel={app.copy.home.primary}
           aiLabel={app.copy.home.ai}
-          settingsLabel={app.copy.home.secondary}
+          helpLabel={app.copy.home.secondary}
           onStart={app.startGame}
           onAiStart={app.startAi}
-          onSettings={app.openHomeSettings}
+          onHelp={app.openHelp}
+        />
+      ) : null}
+
+      {app.screen === "help" ? (
+        <HelpScreen
+          tag={app.copy.help.tag}
+          title={app.copy.help.title}
+          subtitle={app.copy.help.subtitle}
+          hint={app.copy.help.hint}
+          sections={activeHelpSections}
+          currentPage={activeHelpPage}
+          totalPages={totalHelpPages}
+          previousLabel={app.copy.help.previous}
+          nextLabel={app.copy.help.next}
+          startLabel={app.copy.help.primary}
+          aiLabel={app.copy.help.ai}
+          homeLabel={app.copy.help.home}
+          onPrevious={() => app.setHelpPage(activeHelpPage - 1)}
+          onNext={() => app.setHelpPage(activeHelpPage + 1)}
+          onStart={app.startGame}
+          onAiStart={app.startAi}
+          onHome={app.goHome}
         />
       ) : null}
 

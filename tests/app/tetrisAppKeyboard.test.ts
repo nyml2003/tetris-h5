@@ -27,10 +27,7 @@ describe("tetrisAppKeyboard", () => {
     };
 
     expect(resolveKeyboardAction(homeState, "Enter")).toEqual({ type: "start" });
-    expect(resolveKeyboardAction(homeState, "KeyS")).toEqual({
-      type: "openSettings",
-      source: "home",
-    });
+    expect(resolveKeyboardAction(homeState, "KeyS")).toBeNull();
     expect(resolveKeyboardAction(settingsState, "Escape")).toEqual({
       type: "leaveSettings",
     });

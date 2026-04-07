@@ -1,4 +1,4 @@
-import { createRef } from "react";
+﻿import { createRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -40,7 +40,6 @@ function createMockApp(overrides: Record<string, unknown> = {}) {
     moveRight: vi.fn(),
     nextPiece: "I",
     openGameSettings: vi.fn(),
-    openHomeSettings: vi.fn(),
     playerMode: "manual",
     playAgain: vi.fn(),
     rotate: vi.fn(),
@@ -73,7 +72,7 @@ describe("App", () => {
     });
   });
 
-  it("renders the home screen actions and copy", () => {
+  it("renders the home screen actions and keyboard guide", () => {
     mockUseTetrisApp.mockReturnValue(createMockApp());
 
     const markup = renderToStaticMarkup(<App />);
@@ -81,7 +80,9 @@ describe("App", () => {
     expect(markup).toContain(zhCN.home.title);
     expect(markup).toContain(zhCN.home.primary);
     expect(markup).toContain(zhCN.home.ai);
-    expect(markup).toContain(zhCN.home.secondary);
+    expect(markup).toContain(zhCN.home.keyboardTitle);
+    expect(markup).toContain("Space");
+    expect(markup).not.toContain(zhCN.home.secondary);
   });
 
   it("renders the gameplay screen with stats, preview, ai badge, and controls", () => {

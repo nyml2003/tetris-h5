@@ -1,4 +1,4 @@
-import type { TetrominoType } from "@/game/types";
+﻿import type { TetrominoType } from "@/game/types";
 
 export const pieceLabels: Record<TetrominoType, string> = {
   I: "I",
@@ -24,18 +24,87 @@ export const zhCN = {
     subtitle: "打开即玩，当前设备竖屏内不滚动。",
     primary: "开始游戏",
     ai: "AI 代玩",
-    secondary: "操作与设置",
+    secondary: "查看键位",
+    note: "键位说明和触屏操作已拆到独立页面，首页只保留快速进入。",
     bullets: [
       "左移 / 右移：调整落点",
       "旋转：快速寻找缝隙",
       "加速 / 直落：提节奏抢清行",
     ],
   },
+  help: {
+    tag: "操作说明",
+    title: "键位与交互",
+    subtitle: "帮助页按双栏分组，内容多时自动分成多页，不再挤占首页高度。",
+    primary: "开始游戏",
+    ai: "AI 代玩",
+    home: "返回首页",
+    previous: "上一页",
+    next: "下一页",
+    hint: "键盘：Enter 开始，A 启动 AI，Esc 返回首页。",
+    sections: [
+      {
+        title: "移动与落子",
+        description: "键盘基础操作",
+        items: [
+          { key: "← / →", value: "左右移动" },
+          { key: "↑", value: "旋转当前方块" },
+          { key: "↓", value: "加速下落" },
+          { key: "Space", value: "直接落下" },
+        ],
+      },
+      {
+        title: "流程控制",
+        description: "局内快捷键",
+        items: [
+          { key: "P / Esc", value: "暂停当前对局" },
+          { key: "R", value: "重新开局" },
+          { key: "Enter", value: "从首页或帮助页直接开一局" },
+        ],
+      },
+      {
+        title: "触屏按钮",
+        description: "底部操作区",
+        items: [
+          { key: "左移 / 右移", value: "支持按住连续触发" },
+          { key: "旋转 / 直落", value: "高频操作单独强调" },
+          { key: "暂停", value: "可从底部或顶部进入" },
+        ],
+      },
+      {
+        title: "AI 代玩",
+        description: "代打与接管",
+        items: [
+          { key: "AI 代玩", value: "从首页直接进入自动模式" },
+          { key: "P / Esc", value: "暂停后可人工接管" },
+          { key: "接管后", value: "原局面保留，直接切回手动" },
+        ],
+      },
+      {
+        title: "界面信息",
+        description: "抬头数据区",
+        items: [
+          { key: "分数", value: "软降和消行都会增长" },
+          { key: "消行 / 等级", value: "决定节奏变化" },
+          { key: "下一块", value: "右上角实时预览" },
+        ],
+      },
+      {
+        title: "浏览方式",
+        description: "帮助页翻阅",
+        items: [
+          { key: "双栏布局", value: "每页两列卡片并排查看" },
+          { key: "上一页 / 下一页", value: "内容变多时分页浏览" },
+          { key: "浏览器返回", value: "可回退到上一页状态" },
+        ],
+      },
+    ],
+  },
   game: {
     status: "进行中",
     pause: "暂停",
-    keyboard: "键盘也可用：方向键移动，空格直落。",
-    aiHint: "AI 正在光速代打，手动移动已锁定。",
+    keyboard: "键盘可用：← → 移动，↑ 旋转，↓ 加速，Space 直落，P / Esc 暂停，R 重开。",
+    aiHint: "AI 正在代打，手动移动已锁定；按 P 或 Esc 可暂停并接管。",
     aiBadge: "AUTO / TURBO x4",
   },
   settings: {
