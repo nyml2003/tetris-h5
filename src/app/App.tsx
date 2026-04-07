@@ -148,6 +148,7 @@ function ControlButton({
     <button
       type="button"
       className={`control-button${accent ? " control-button--accent" : ""}`}
+      aria-label={label}
       disabled={disabled}
       {...pressBind}
     >
@@ -181,8 +182,11 @@ function HomeScreen({
   onHelp,
 }: HomeScreenProps) {
   return (
-    <section className="app-screen app-screen--home">
-      <div className="screen-card screen-card--hero screen-card--home">
+    <section className="app-screen app-screen--home" data-testid="screen-home">
+      <div
+        className="screen-card screen-card--hero screen-card--home"
+        data-testid="home-card"
+      >
         <span className="screen-tag">{tag}</span>
         <h1 className="screen-title">{title}</h1>
         <p className="screen-subtitle">{subtitle}</p>
@@ -196,7 +200,7 @@ function HomeScreen({
         <p className="home-note">{note}</p>
       </div>
 
-      <div className="screen-actions screen-actions--home">
+      <div className="screen-actions screen-actions--home" data-testid="home-actions">
         <ActionButton label={startLabel} onPress={onStart} />
         <ActionButton label={aiLabel} onPress={onAiStart} variant="secondary" />
         <ActionButton label={helpLabel} onPress={onHelp} variant="secondary" />
@@ -225,15 +229,21 @@ function HelpScreen({
   onHome,
 }: HelpScreenProps) {
   return (
-    <section className="app-screen app-screen--panel app-screen--help">
-      <div className="screen-card screen-card--panel screen-card--help">
+    <section
+      className="app-screen app-screen--panel app-screen--help"
+      data-testid="screen-help"
+    >
+      <div
+        className="screen-card screen-card--panel screen-card--help"
+        data-testid="help-panel"
+      >
         <span className="screen-tag">{tag}</span>
         <h2 className="screen-title screen-title--panel">{title}</h2>
         <p className="screen-subtitle screen-subtitle--panel">{subtitle}</p>
 
-        <div className="help-grid">
+        <div className="help-grid" data-testid="help-grid">
           {sections.map((section) => (
-            <article key={section.title} className="help-card">
+            <article key={section.title} className="help-card" data-testid="help-card">
               <div className="help-card__header">
                 <strong className="help-card__title">{section.title}</strong>
                 <span className="help-card__meta">{section.description}</span>
@@ -252,14 +262,17 @@ function HelpScreen({
         </div>
 
         <div className="help-footer">
-          <div className="help-pagination">
+          <div className="help-pagination" data-testid="help-pagination">
             <ActionButton
               label={previousLabel}
               onPress={onPrevious}
               variant="secondary"
               disabled={currentPage <= 0}
             />
-            <span className="help-pagination__status">
+            <span
+              className="help-pagination__status"
+              data-testid="help-pagination-status"
+            >
               第 {currentPage + 1} / {totalPages} 页
             </span>
             <ActionButton
@@ -274,7 +287,10 @@ function HelpScreen({
         </div>
       </div>
 
-      <div className="screen-actions screen-actions--panel screen-actions--help">
+      <div
+        className="screen-actions screen-actions--panel screen-actions--help"
+        data-testid="help-actions"
+      >
         <ActionButton label={startLabel} onPress={onStart} />
         <ActionButton label={aiLabel} onPress={onAiStart} variant="secondary" />
         <ActionButton label={homeLabel} onPress={onHome} variant="secondary" />
@@ -300,12 +316,19 @@ function GameScreen({
   controls,
 }: GameScreenProps) {
   return (
-    <section className="app-screen app-screen--game">
-      <header className="game-topbar">
+    <section className="app-screen app-screen--game" data-testid="screen-game">
+      <header className="game-topbar" data-testid="game-topbar">
         <div className="game-topbar__title">
           <div className="game-topbar__meta">
             <span className="screen-tag">{title}</span>
-            {modeBadge ? <span className="header-pill header-pill--ai">{modeBadge}</span> : null}
+            {modeBadge ? (
+              <span
+                className="header-pill header-pill--ai"
+                data-testid="game-mode-badge"
+              >
+                {modeBadge}
+              </span>
+            ) : null}
           </div>
 
           <button
@@ -340,8 +363,8 @@ function GameScreen({
         </div>
       </header>
 
-      <div ref={stageRef} className="game-stage">
-        <div className="game-board-shell" style={boardStyle}>
+      <div ref={stageRef} className="game-stage" data-testid="game-stage">
+        <div className="game-board-shell" style={boardStyle} data-testid="game-board-shell">
           <canvas
             ref={boardCanvasRef}
             className="game-board-canvas"
@@ -350,7 +373,7 @@ function GameScreen({
         </div>
       </div>
 
-      <footer className="game-footer">
+      <footer className="game-footer" data-testid="game-footer">
         <div className="controls-grid">
           {controls.map((control) => (
             <ControlButton
@@ -384,13 +407,13 @@ function SettingsScreen({
   onHome,
 }: SettingsScreenProps) {
   return (
-    <section className="app-screen app-screen--panel">
-      <div className="screen-card screen-card--panel">
+    <section className="app-screen app-screen--panel" data-testid="screen-settings">
+      <div className="screen-card screen-card--panel" data-testid="settings-panel">
         <span className="screen-tag">暂停 / 设置</span>
         <h2 className="screen-title screen-title--panel">{title}</h2>
         <p className="screen-subtitle screen-subtitle--panel">{subtitle}</p>
 
-        <div className="settings-list">
+        <div className="settings-list" data-testid="settings-list">
           {items.map((item) => (
             <article key={item.label} className="settings-item">
               <span className="settings-item__label">{item.label}</span>
@@ -400,7 +423,7 @@ function SettingsScreen({
         </div>
       </div>
 
-      <div className="screen-actions screen-actions--panel">
+      <div className="screen-actions screen-actions--panel" data-testid="settings-actions">
         <ActionButton label={primaryLabel} onPress={onPrimary} />
         {takeOverLabel && onTakeOver ? (
           <ActionButton
@@ -427,8 +450,8 @@ function ResultScreen({
   onSecondary,
 }: ResultScreenProps) {
   return (
-    <section className="app-screen app-screen--panel">
-      <div className="screen-card screen-card--result">
+    <section className="app-screen app-screen--panel" data-testid="screen-result">
+      <div className="screen-card screen-card--result" data-testid="result-card">
         <span className="screen-tag">{tag}</span>
         <h2 className="screen-title screen-title--panel">{title}</h2>
         <p className="screen-subtitle screen-subtitle--panel">{subtitle}</p>
@@ -443,7 +466,7 @@ function ResultScreen({
         </div>
       </div>
 
-      <div className="screen-actions screen-actions--dual">
+      <div className="screen-actions screen-actions--dual" data-testid="result-actions">
         <ActionButton label={primaryLabel} onPress={onPrimary} />
         <ActionButton
           label={secondaryLabel}
@@ -519,7 +542,7 @@ export function App() {
   const showTakeOverAction = app.settingsFromGame && app.isAiMode;
 
   return (
-    <div className="app-root">
+    <div className="app-root" data-testid="app-root">
       <div className="app-glow app-glow--left" />
       <div className="app-glow app-glow--right" />
 
@@ -617,5 +640,3 @@ export function App() {
     </div>
   );
 }
-
-

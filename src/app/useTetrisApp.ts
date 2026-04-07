@@ -16,7 +16,6 @@ import {
   selectSettingsFromGame,
 } from "@/app/tetrisAppViewModel";
 import {
-  createAppState,
   reduceAppState,
   type AppAction,
 } from "@/app/tetrisAppState";

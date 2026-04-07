@@ -1,7 +1,7 @@
 ﻿import { act } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { useTetrisApp } from "@/app/useTetrisApp";
+import { useTetrisApp, type AppState } from "@/app/useTetrisApp";
 
 import { installRafMock } from "../utils/browser";
 import { renderHook } from "../utils/renderHarness";
@@ -14,6 +14,10 @@ function dispatchKey(code: string, cancelable = false) {
   });
 
   return event;
+}
+
+interface AppHistoryEntry {
+  appState: AppState;
 }
 
 describe("useTetrisApp", () => {
@@ -103,8 +107,10 @@ describe("useTetrisApp", () => {
       hook.current.setHelpPage(1);
     });
 
+    const historyState = window.history.state as AppHistoryEntry;
+
     expect(hook.current.helpPage).toBe(1);
-    expect(window.history.state.appState.helpPage).toBe(1);
+    expect(historyState.appState.helpPage).toBe(1);
   });
 
   it("advances frames only while the game is actively running", () => {
@@ -232,7 +238,7 @@ describe("useTetrisApp", () => {
       hook.current.setHelpPage(1);
     });
 
-    const helpEntry = window.history.state;
+    const helpEntry = window.history.state as AppHistoryEntry;
 
     act(() => {
       hook.current.goHome();
