@@ -19,8 +19,8 @@ import { GameBoardRenderer } from "@/game/rendering/gameBoardRenderer";
 import { PreviewRenderer } from "@/game/rendering/previewRenderer";
 
 const HELP_SECTIONS_PER_PAGE = 4;
-// Renderers are stateless; keep one instance per surface so the hook only
-// redraws for value and size changes, not because a class was recreated.
+// renderer 本身不持有业务状态，所以这里做成模块级单例即可。
+// 这样 hook 只会因为 value/尺寸变化而重绘，不会因为实例重建而多跑一轮。
 const gameBoardRenderer = new GameBoardRenderer();
 const previewRenderer = new PreviewRenderer();
 
@@ -32,8 +32,8 @@ function resolveBoardStyle(
     return undefined;
   }
 
-  // The canvas must keep the 10x20 board ratio, so its width is capped by
-  // both the horizontal space and half of the available stage height.
+  // 棋盘固定是 10x20，因此宽高比恒定为 1:2。
+  // 宽度既不能超过可用宽度，也不能超过“当前高度所能容纳的半宽”。
   const boardWidth = Math.floor(Math.min(width, height * 0.5));
 
   return {

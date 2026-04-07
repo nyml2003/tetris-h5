@@ -11,6 +11,8 @@ export function useCanvasSurface<T>(
   const frameRef = useRef<number | null>(null);
 
   const scheduleRender = useEffectEvent(() => {
+    // 同一个 canvas 只保留最后一次待执行的绘制请求，避免在连续
+    // resize 或状态更新时把过期帧也画出来。
     if (frameRef.current !== null) {
       window.cancelAnimationFrame(frameRef.current);
     }
@@ -26,16 +28,18 @@ export function useCanvasSurface<T>(
     });
   });
 
-  // Resize and prop changes both flow through the same scheduler so there is
-  // only ever one pending frame for a given canvas surface.
+  // 尺寸变化和 value 变化都走同一个调度入口，这样 hook 只需要维护
+  // 一套“下一帧重绘”的逻辑。
   useResizeObserver(canvasRef, scheduleRender);
 
   useLayoutEffect(() => {
+    // 用 layout effect 确保 DOM 尺寸刚稳定就安排绘制，减少首帧闪烁。
     scheduleRender();
   }, [renderer, scheduleRender, value]);
 
   useEffect(() => {
     return () => {
+      // 组件卸载时清掉最后一个待执行帧，避免对已销毁节点继续绘制。
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);
       }

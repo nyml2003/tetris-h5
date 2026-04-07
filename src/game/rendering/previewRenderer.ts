@@ -20,10 +20,12 @@ export class PreviewRenderer extends Canvas2dRenderer<TetrominoType | null> {
     const { context, width, height } = preparedCanvas;
     const cellSize = Math.min(width / PREVIEW_COLUMNS, height / PREVIEW_ROWS);
 
+    // 预览区沿用棋盘的背景和网格，但只负责展示一个被居中的 next piece。
     this.drawBackdrop(context, width, height);
     this.drawGrid(context, width, height, PREVIEW_COLUMNS, PREVIEW_ROWS);
 
     if (!nextPiece) {
+      // 没有下一个方块时保留空底板，避免预览区尺寸和视觉节奏发生变化。
       return;
     }
 
@@ -57,8 +59,8 @@ export class PreviewRenderer extends Canvas2dRenderer<TetrominoType | null> {
     const pieceWidth = (maxX - minX + 1) * cellSize;
     const pieceHeight = (maxY - minY + 1) * cellSize;
 
-    // Center the piece by its occupied bounding box, then translate the result
-    // back into cell coordinates so `drawFilledCell` can keep its usual math.
+    // 先按实际占用包围盒算居中位置，再把结果折回“格子坐标”。
+    // 这样下面仍然可以复用 drawFilledCell，而不用单独写一套像素级绘制逻辑。
     return {
       cellSize,
       originX: (width - pieceWidth) / (2 * cellSize) - minX,
