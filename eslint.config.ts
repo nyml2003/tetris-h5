@@ -18,9 +18,11 @@ export default tseslint.config(
   {
     files: [
       "src/**/*.{ts,tsx}",
+      "scripts/**/*.ts",
       "tests/**/*.{ts,tsx}",
       "vite.config.ts",
       "playwright.config.ts",
+      "eslint.config.ts",
     ],
     languageOptions: {
       ecmaVersion: 2023,
