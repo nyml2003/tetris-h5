@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 
 import { createAppState, reduceAppState } from "@/app/tetrisAppState";
 import { restartGame } from "@/game/tetrisEngine";
@@ -10,6 +10,15 @@ describe("tetrisAppState", () => {
     expect(nextState.playerMode).toBe("manual");
     expect(nextState.screen).toBe("game");
     expect(nextState.game.status).toBe("running");
+  });
+
+  it("opens the dedicated help page and tracks help pagination", () => {
+    const helpState = reduceAppState(createAppState(), { type: "openHelp" });
+    const pagedState = reduceAppState(helpState, { type: "setHelpPage", page: 1 });
+
+    expect(helpState.screen).toBe("help");
+    expect(helpState.helpPage).toBe(0);
+    expect(pagedState.helpPage).toBe(1);
   });
 
   it("starts ai mode and preserves it when replaying", () => {
@@ -30,6 +39,7 @@ describe("tetrisAppState", () => {
     expect(replayState.playerMode).toBe("ai");
     expect(replayState.screen).toBe("game");
     expect(replayState.game.status).toBe("running");
+    expect(replayState.helpPage).toBe(0);
   });
 
   it("opens settings from gameplay and resumes when leaving", () => {
@@ -37,6 +47,7 @@ describe("tetrisAppState", () => {
       playerMode: "manual" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
+      helpPage: 0,
       game: restartGame(["T", "O", "I"]),
     };
 
@@ -74,6 +85,7 @@ describe("tetrisAppState", () => {
         playerMode: "manual" as const,
         screen: "game" as const,
         settingsSource: "home" as const,
+        helpPage: 0,
         game: {
           ...restartGame(["T", "O", "I"]),
           status: "gameOver" as const,
@@ -88,5 +100,6 @@ describe("tetrisAppState", () => {
     expect(homeState.screen).toBe("home");
     expect(homeState.playerMode).toBe("manual");
     expect(homeState.settingsSource).toBe("home");
+    expect(homeState.helpPage).toBe(0);
   });
 });

@@ -12,6 +12,7 @@ describe("tetrisGameLoop", () => {
       playerMode: "manual" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
+      helpPage: 0,
       game: restartGame(["T", "O", "I"]),
     };
 
@@ -27,6 +28,7 @@ describe("tetrisGameLoop", () => {
       playerMode: "manual" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
+      helpPage: 0,
       game: restartGame(["T", "O", "I"]),
     };
 
@@ -48,6 +50,7 @@ describe("tetrisGameLoop", () => {
       playerMode: "ai" as const,
       screen: "settings" as const,
       settingsSource: "game" as const,
+      helpPage: 0,
       game: {
         ...restartGame(["T", "O", "I"]),
         status: "paused" as const,

@@ -300,7 +300,7 @@ function GameScreen({
   controls,
 }: GameScreenProps) {
   return (
-    <section className="app-screen">
+    <section className="app-screen app-screen--game">
       <header className="game-topbar">
         <div className="game-topbar__title">
           <div className="game-topbar__meta">
@@ -617,3 +617,5 @@ export function App() {
     </div>
   );
 }
+
+

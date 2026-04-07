@@ -21,6 +21,17 @@ describe("useTetrisApp", () => {
     window.history.replaceState(null, "", "/");
   });
 
+  it("hydrates the help page when the current path is /help", () => {
+    installRafMock();
+    window.history.replaceState(null, "", "/help");
+
+    const hook = renderHook(() => useTetrisApp());
+
+    expect(hook.current.screen).toBe("help");
+    expect(hook.current.helpPage).toBe(0);
+    expect(window.location.pathname).toBe("/help");
+  });
+
   it("hydrates a new game when the current path is /play", () => {
     installRafMock();
     window.history.replaceState(null, "", "/play");
@@ -32,12 +43,20 @@ describe("useTetrisApp", () => {
     expect(window.location.pathname).toBe("/play");
   });
 
-  it("handles home, game, and settings keyboard flows", () => {
+  it("handles home, help, game, and settings keyboard flows", () => {
     installRafMock();
     const hook = renderHook(() => useTetrisApp());
 
     expect(hook.current.screen).toBe("home");
     expect(hook.current.isPlayable).toBe(false);
+    expect(window.location.pathname).toBe("/");
+
+    dispatchKey("KeyH");
+    expect(hook.current.screen).toBe("help");
+    expect(window.location.pathname).toBe("/help");
+
+    dispatchKey("Escape");
+    expect(hook.current.screen).toBe("home");
     expect(window.location.pathname).toBe("/");
 
     dispatchKey("Enter");
@@ -67,6 +86,25 @@ describe("useTetrisApp", () => {
     expect(hook.current.screen).toBe("game");
     expect(hook.current.gameState.score).toBe(0);
     expect(window.location.pathname).toBe("/play");
+  });
+
+  it("tracks help-page pagination and route state", () => {
+    installRafMock();
+    const hook = renderHook(() => useTetrisApp());
+
+    act(() => {
+      hook.current.openHelp();
+    });
+
+    expect(hook.current.screen).toBe("help");
+    expect(window.location.pathname).toBe("/help");
+
+    act(() => {
+      hook.current.setHelpPage(1);
+    });
+
+    expect(hook.current.helpPage).toBe(1);
+    expect(window.history.state.appState.helpPage).toBe(1);
   });
 
   it("advances frames only while the game is actively running", () => {
@@ -190,14 +228,11 @@ describe("useTetrisApp", () => {
     const hook = renderHook(() => useTetrisApp());
 
     act(() => {
-      hook.current.startGame();
+      hook.current.openHelp();
+      hook.current.setHelpPage(1);
     });
 
-    act(() => {
-      hook.current.openGameSettings();
-    });
-
-    const pausedPlayEntry = window.history.state;
+    const helpEntry = window.history.state;
 
     act(() => {
       hook.current.goHome();
@@ -207,17 +242,16 @@ describe("useTetrisApp", () => {
     expect(window.location.pathname).toBe("/");
 
     act(() => {
-      window.history.replaceState(pausedPlayEntry, "", "/play");
+      window.history.replaceState(helpEntry, "", "/help");
       window.dispatchEvent(
         new PopStateEvent("popstate", {
-          state: pausedPlayEntry,
+          state: helpEntry,
         })
       );
     });
 
-    expect(hook.current.screen).toBe("settings");
-    expect(hook.current.settingsFromGame).toBe(true);
-    expect(hook.current.gameState.status).toBe("paused");
-    expect(window.location.pathname).toBe("/play");
+    expect(hook.current.screen).toBe("help");
+    expect(hook.current.helpPage).toBe(1);
+    expect(window.location.pathname).toBe("/help");
   });
 });

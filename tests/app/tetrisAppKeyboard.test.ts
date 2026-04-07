@@ -11,11 +11,15 @@ describe("tetrisAppKeyboard", () => {
   it("flags only gameplay movement keys for scroll prevention", () => {
     expect(shouldPreventKeyboardScroll("ArrowDown")).toBe(true);
     expect(shouldPreventKeyboardScroll("Space")).toBe(true);
-    expect(shouldPreventKeyboardScroll("KeyS")).toBe(false);
+    expect(shouldPreventKeyboardScroll("KeyH")).toBe(false);
   });
 
-  it("maps home and settings screen keys to app actions", () => {
+  it("maps home, help, and settings screen keys to app actions", () => {
     const homeState = createAppState();
+    const helpState = {
+      ...createAppState(),
+      screen: "help" as const,
+    };
     const settingsState = {
       ...homeState,
       screen: "settings" as const,
@@ -27,7 +31,12 @@ describe("tetrisAppKeyboard", () => {
     };
 
     expect(resolveKeyboardAction(homeState, "Enter")).toEqual({ type: "start" });
-    expect(resolveKeyboardAction(homeState, "KeyS")).toBeNull();
+    expect(resolveKeyboardAction(homeState, "KeyH")).toEqual({ type: "openHelp" });
+    expect(resolveKeyboardAction(helpState, "Enter")).toEqual({ type: "start" });
+    expect(resolveKeyboardAction(helpState, "KeyA")).toEqual({ type: "startAi" });
+    expect(resolveKeyboardAction(helpState, "Escape")).toEqual({
+      type: "goHome",
+    });
     expect(resolveKeyboardAction(settingsState, "Escape")).toEqual({
       type: "leaveSettings",
     });
@@ -41,6 +50,7 @@ describe("tetrisAppKeyboard", () => {
       playerMode: "manual" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
+      helpPage: 0,
       game: restartGame(["T", "O", "I"]),
     };
     const resultState = {
@@ -77,6 +87,7 @@ describe("tetrisAppKeyboard", () => {
       playerMode: "ai" as const,
       screen: "game" as const,
       settingsSource: "home" as const,
+      helpPage: 0,
       game: restartGame(["T", "O", "I"]),
     };
 

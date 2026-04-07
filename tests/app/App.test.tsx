@@ -32,6 +32,7 @@ function createMockApp(overrides: Record<string, unknown> = {}) {
     gameState,
     goHome: vi.fn(),
     hardDrop: vi.fn(),
+    helpPage: 0,
     isAiMode: false,
     isGameScreen: false,
     isPlayable: false,
@@ -40,10 +41,12 @@ function createMockApp(overrides: Record<string, unknown> = {}) {
     moveRight: vi.fn(),
     nextPiece: "I",
     openGameSettings: vi.fn(),
+    openHelp: vi.fn(),
     playerMode: "manual",
     playAgain: vi.fn(),
     rotate: vi.fn(),
     screen: "home",
+    setHelpPage: vi.fn(),
     settingsFromGame: false,
     settingsItems: [
       ...zhCN.settings.items,
@@ -72,7 +75,7 @@ describe("App", () => {
     });
   });
 
-  it("renders the home screen actions and keyboard guide", () => {
+  it("renders the home screen actions and lighter summary", () => {
     mockUseTetrisApp.mockReturnValue(createMockApp());
 
     const markup = renderToStaticMarkup(<App />);
@@ -80,9 +83,26 @@ describe("App", () => {
     expect(markup).toContain(zhCN.home.title);
     expect(markup).toContain(zhCN.home.primary);
     expect(markup).toContain(zhCN.home.ai);
-    expect(markup).toContain(zhCN.home.keyboardTitle);
-    expect(markup).toContain("Space");
-    expect(markup).not.toContain(zhCN.home.secondary);
+    expect(markup).toContain(zhCN.home.secondary);
+    expect(markup).toContain(zhCN.home.note);
+    expect(markup).not.toContain(zhCN.help.title);
+  });
+
+  it("renders the paged help screen content", () => {
+    mockUseTetrisApp.mockReturnValue(
+      createMockApp({
+        helpPage: 0,
+        screen: "help",
+      })
+    );
+
+    const markup = renderToStaticMarkup(<App />);
+
+    expect(markup).toContain(zhCN.help.title);
+    expect(markup).toContain(zhCN.help.previous);
+    expect(markup).toContain(zhCN.help.next);
+    expect(markup).toContain(zhCN.help.sections[0].title);
+    expect(markup).toContain("第 1 / 2 页");
   });
 
   it("renders the gameplay screen with stats, preview, ai badge, and controls", () => {
